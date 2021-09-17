@@ -81,11 +81,9 @@ const App = () => {
         : <>
           <section id="main" className="w-full flex flex-col items-center pt-4 pb-16">
             <div className="container overflow-hidden">
-              <h1 className="text-xl font-bold mb-2">Batch Collect</h1>
-
-
+              <h1 className="text-2xl font-bold mb-2">Batch Collect</h1>
               <textarea
-                className="border p-1 border-gray-300 mt-2 w-1/3 h-full"
+                className="p-3 text-md bg-gray-100 border-gray-300 mt-2 w-full h-72"
                 placeholder="List objkt ids, one per line, e.g:&#10;302412&#10;228477&#10;228411"
                 value={collectStr}
                 onChange={(e) => setCollectStr(e.target.value)}
