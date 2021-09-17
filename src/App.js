@@ -43,10 +43,11 @@ const App = () => {
         }
       }
       setLoading(`Collecting ${toCollect.length} for ${tez} tez`)
-      collect(toCollect)
-      setError('collect failed')
+      await collect(toCollect)
+      setLoading(false)
     } catch {
       setLoading(false)
+      setError('collect failed')
     }
   }, [collectStr])
 
