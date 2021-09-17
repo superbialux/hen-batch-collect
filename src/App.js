@@ -3,6 +3,10 @@ import { getPieceInfo } from './data/api'
 import { collect, connect, disconnect, getAccount } from './data/hen';
 import ReactLoading from "react-loading";
 
+const toTezValue = (price) => {
+  return price / 1000000
+}
+
 const App = () => {
   const [loading, setLoading] = useState(true)
   const [account, setAccount] = useState(false)
@@ -30,13 +34,15 @@ const App = () => {
     try {
       const k = collectStr.split('\n')
       const toCollect = []
+      let tez = 0
       for (const i in k) {
         const piece = await getPieceInfo(k[i])
         if (piece) {
-          console.log(piece)
+          tez += toTezValue(parseFloat(piece.price))
           toCollect.push(piece)
         }
       }
+      setLoading(`Collecting ${toCollect.length} for ${tez} tez`)
       collect(toCollect)
       setError('collect failed')
     } catch {
