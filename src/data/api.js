@@ -1,80 +1,12 @@
 import axios from 'axios'
 
-const keys = {
-  collectorGallery: 'hic_et_nunc_token_holder',
-  mySecondaryMarketSales: 'hic_et_nunc_swap'
-}
-
-export const fetchPieces = async (address, queryType) => {
+export const getPieceInfo = async (id) => {
   const query = `
-  query fetchGallery($address: String!) {
-    hic_et_nunc_token_holder(where: {holder_id: {_eq: $address}, quantity: {_gt: "0"}, token: {supply: {_gt: "0"}}}, order_by: {id: desc}) {
-      token {
-        supply
-        title
-        royalties
+  query Objkt($id: bigint!) {
+    hic_et_nunc_token_by_pk(id: $id) {
+      swaps(where: {status: {_eq: "0"}}, order_by: {price: asc}) {
+        price
         id
-        display_uri
-        token_holders(where: {quantity: {_gt: "0"}}) {
-          holder_id
-          quantity
-          holder {
-            name
-          }
-        }
-        creator {
-          address
-          name
-        }
-        swaps(where: {status: {_eq: "0"}}, order_by: {price: asc}) {
-          amount_left
-          price
-          status
-          id
-          creator {
-            address
-            name
-          }
-        }
-      }
-    }
-    hic_et_nunc_swap(
-      where: {
-        token: {creator: {address: {_neq: $address}}},
-        status: {_in: [0]},
-        creator: {address: {_eq: $address}}
-      },
-      order_by: {token_id: desc}
-    ) {
-      price
-      status
-      token {
-        supply
-        title
-        royalties
-        id
-        display_uri
-        token_holders(where: {quantity: {_gt: "0"}}) {
-          holder_id
-          quantity
-          holder {
-            name
-          }
-        }
-        creator {
-          address
-          name
-        }
-        swaps(where: {status: {_eq: "0"}}, order_by: {price: asc}) {
-          amount_left
-          price
-          status
-          id
-          creator {
-            address
-            name
-          }
-        }
       }
     }
   }
@@ -93,8 +25,19 @@ export const fetchPieces = async (address, queryType) => {
     return await result
   }
 
-  const { data } = await fetchGraphQL(query, 'fetchGallery', { "address": address });
-  const swaps = await data.data[keys[queryType]]
-  return swaps
+  try {
+    const { data } = await fetchGraphQL(query, "Objkt", { "id": id });
+    const result = data.data.hic_et_nunc_token_by_pk
+    result.swaps.sort((a, b) => {
+      return Number(a.price) - Number(b.price)
+    })
+    if (result.swaps.length && result.swaps[0]) {
+      return result.swaps[0]
+    } else {
+      return false
+    }
+  } catch {
+    return false
+  }
 }
 
