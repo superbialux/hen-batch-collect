@@ -36,10 +36,17 @@ const App = () => {
       const toCollect = []
       let tez = 0
       for (const i in k) {
-        const piece = await getPieceInfo(k[i])
+        let [objkt, editions] = k[i].split(' ')
+        const piece = await getPieceInfo(objkt)
+        console.log('ed', editions)
         if (piece) {
-          tez += toTezValue(parseFloat(piece.price))
-          toCollect.push(piece)
+          if (!editions) {
+            editions = 1
+          }
+          for (let i = 0; i < editions; i++) {
+            tez += toTezValue(parseFloat(piece.price))
+            toCollect.push(piece)
+          }
         }
       }
       setLoading(`Collecting ${toCollect.length} for ${tez} tez`)
@@ -86,12 +93,12 @@ const App = () => {
           <p className="text-base text-left font-medium">{loading}</p>
         </section>
         : <>
-          <section id="main" className="w-full flex flex-col items-center pt-4 pb-16">
+          <section id="main" className="w-full flex flex-col items-center p-4 pb-16">
             <div className="container overflow-hidden">
               <h1 className="text-2xl font-bold mb-2">Batch Collect</h1>
               <textarea
                 className="p-3 text-md bg-gray-100 border-gray-300 mt-2 w-full h-72"
-                placeholder="List objkt ids, one per line, e.g:&#10;302412&#10;228477&#10;228411"
+                placeholder="List objkt ids, one per line, e.g:&#10;302412&#10;228477&#10;228411&#10;228411 5 - will collect 5 editions of this objkt"
                 value={collectStr}
                 onChange={(e) => setCollectStr(e.target.value)}
               />
@@ -104,7 +111,7 @@ const App = () => {
               </div>}
             </div>
           </section>
-          <footer className="fixed bottom-0 bg-gray-900 w-full flex flex-row justify-center">
+          <footer className="fixed bottom-0 bg-gray-900 w-full flex flex-row justify-center px-4">
             <div className="container flex flex-row justify-between py-3">
               <div className="flex-1 flex flex-row justify-start">
                 {account
